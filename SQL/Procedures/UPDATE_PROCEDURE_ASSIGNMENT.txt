@@ -1,0 +1,54 @@
+DROP PROCEDURE UPDATE_LEADERS_SCORE;
+
+--#SET TERMINATOR @
+CREATE PROCEDURE UPDATE_LEADERS_SCORE ( 
+    IN in_School_ID INTEGER, IN in_Leader_Score INTEGER )     -- ( { IN/OUT type } { parameter-name } { data-type }, ... )    
+LANGUAGE SQL                                                  -- Language used in this routine
+MODIFIES SQL DATA                                             -- This routine will only write/modify data in the table
+
+BEGIN 		
+	    UPDATE CHICAGO_PUBLIC_SCHOOLS as CPS
+        SET CPS.LEADERS_SCORE = in_Leader_Score
+        WHERE CPS.SCHOOL_ID = in_School_ID;
+        
+        IF in_Leader_Score >= 80 AND in_Leader_Score <= 99 THEN   -- Start of conditional statement
+        	UPDATE CHICAGO_PUBLIC_SCHOOLS
+        	SET LEADERS_ICON = 'Very Srong'
+        	WHERE SCHOOL_ID = in_School_ID;
+    
+    	ELSEIF in_Leader_Score >= 60 AND in_Leader_Score < 79 THEN   -- Start of conditional statement
+        	UPDATE CHICAGO_PUBLIC_SCHOOLS
+        	SET LEADERS_ICON = 'Strong'
+        	WHERE SCHOOL_ID = in_School_ID;
+        
+        ELSEIF in_Leader_Score >= 40 AND in_Leader_Score < 59 THEN   -- Start of conditional statement
+        	UPDATE CHICAGO_PUBLIC_SCHOOLS
+        	SET LEADERS_ICON = 'Average'
+        	WHERE SCHOOL_ID = in_School_ID;
+        
+        ELSEIF in_Leader_Score >= 20 AND in_Leader_Score < 39 THEN   -- Start of conditional statement
+        	UPDATE CHICAGO_PUBLIC_SCHOOLS
+        	SET LEADERS_ICON = 'Weak'
+        	WHERE SCHOOL_ID = in_School_ID;
+        
+        ELSEIF in_Leader_Score >= 0 AND in_Leader_Score < 20 THEN 
+        	UPDATE CHICAGO_PUBLIC_SCHOOLS
+        	SET LEADERS_ICON = 'Very weak'
+        	WHERE SCHOOL_ID = in_School_ID;        
+
+		ELSE 
+			ROLLBACK WORK;	
+		
+    	END IF;                                                   -- End of conditional statement   
+    	COMMIT WORK;
+END
+@                                                           -- Routine termination character
+
+
+-- CALL THE PROCEDURE
+--ALTER TABLE CHICAGO_PUBLIC_SCHOOLS 
+--ALTER COLUMN LEADERS_ICON SET DATA TYPE VARCHAR(20);
+
+--CALL UPDATE_LEADERS_SCORE (610281,101) ;
+--SELECT CPS.SCHOOL_ID , CPS.LEADERS_SCORE, CPS.LEADERS_ICON FROM CHICAGO_PUBLIC_SCHOOLS as CPS
+--	WHERE CPS.SCHOOL_ID = 610281;
